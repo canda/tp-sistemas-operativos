@@ -12,10 +12,10 @@ if ! command -v gcc &> /dev/null; then
 
 fi
 # Compilar el programa para ejecutarlo en Red Hat.
-gcc -O0 -o ./unidad-1 ./unidad-1.c
+gcc -O0 -static unidad-1.c -o unidad-1
 
 # Generar ensamblador desde el código C, sin optimizaciones.
-gcc -S -O0 ./unidad-1.c -o ./unidad-1.s
+objdump -d unidad-1 > unidad-1.s
 
-# Mosrar el ensamblador generado.
+# Mostrar el ensamblador generado.
 cat ./unidad-1.s
