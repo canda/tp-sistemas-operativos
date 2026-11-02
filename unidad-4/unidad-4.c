@@ -5,7 +5,7 @@ int main() {
     printf("Iniciando la configuración del disco de la Unidad 4...\n");
 
     // Ejecuta el script de bash automatizado
-    int ret = system("./configurar_disco.sh");
+    int ret = system("./unidad-4.sh");
     
     if (ret == -1) {
         perror("Error al ejecutar el script de configuración");

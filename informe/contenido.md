@@ -40,6 +40,19 @@ El reporte del script presenta los tiempos de cada modalidad y calcula la aceler
 ## Conclusión
 El ejercicio mantiene constante la cantidad de trabajo y cambia la forma de planificarlo. Permite separar concurrencia de paralelismo y discutir por qué iniciar más procesos no garantiza reducir el tiempo total.
 
+# Evidencia de la Unidad 2 | Ejecución
+![Figura 3. CPU permitidas y resultados de las tareas secuenciales y concurrentes. Fuente: unidad-2/unidad-2-evidencia-1.jpeg.](unidad-2/unidad-2-evidencia-1.jpeg)
+La ejecución dispone de cuatro CPU lógicas, numeradas de 0 a 3. La terminal muestra el mismo resultado numérico en las tareas: 500000000500000000. El script mantiene esa carga de trabajo y cambia la afinidad y la concurrencia entre modalidades.
+
+# Evidencia de la Unidad 2 | Tiempos
+![Figura 4. Reporte del tiempo total de diez tareas por modalidad. Fuente: unidad-2/unidad-2-evidencia-2.jpeg.](unidad-2/unidad-2-evidencia-2.jpeg)
+## Resultados de la ejecución
+- Secuencial: 28,375 segundos.
+- Pseudoparalela: 28,168 segundos.
+- Paralela: 7,428 segundos.
+- Aceleración paralela respecto de la secuencial: 3,82 veces.
+Los tiempos secuencial y pseudoparalelo son similares, mientras que el acceso concurrente a las cuatro CPU permitidas reduce el tiempo total. La aceleración se calcula como 28,375 / 7,428 y corresponde a esta ejecución concreta.
+
 # Unidad 3 | Compilación, carga y memoria
 ## Problema y objetivo
 Una aplicación necesita reservar 100 MiB y acceder de manera espaciada a esa región. Se estudia cómo se construye el ejecutable, cómo comienza su ejecución y cómo se relacionan sus accesos con la memoria virtual.
@@ -79,7 +92,7 @@ El archivo C del anexo es un lanzador mediante system y utiliza el nombre config
 ## Conclusión
 El ejercicio integra particionado, formato y montaje persistente. El uso de UUID vincula la configuración con el sistema de archivos, mientras que las herramientas de consola permiten consultar cada etapa de la administración del almacenamiento.
 
-# Unidad 5 | Entrada y salida
+# Unidad 5 | Entrada y salida: parte A
 ## Problema y objetivo
 Se necesita identificar dispositivos de bloque y carácter y analizar cuánto cambia el costo de leer un archivo al variar el tamaño del búfer. También se observa el contador de interrupciones antes y después de una escritura de disco.
 ## Fundamento teórico
@@ -97,8 +110,8 @@ El contador del C aumenta solo cuando read devuelve un valor positivo. No incluy
 La caché de páginas y el orden fijo de las pruebas influyen en los tiempos: no son una medición aislada de velocidad del disco. El contador de interrupciones agrupa coincidencias de varios controladores y puede incluir actividad ajena al ejercicio. No demuestra por sí mismo el uso de DMA ni una correspondencia de una interrupción por transferencia.
 Además, bs=1M y count=100 de dd corresponden a 100 MiB (104.857.600 bytes), aunque el mensaje del script diga 100 MB. El archivo de lectura sí contiene 2 MB decimales.
 
-# Evidencia de la Unidad 5
-![Figura 3. Dispositivos, lecturas con distintos búferes e interrupciones en Red Hat. Fuente: unidad-5/Evidencia U5.png.](unidad-5/Evidencia U5.png)
+# Evidencia de la Unidad 5 | Parte A
+![Figura 5. Dispositivos, lecturas con distintos búferes e interrupciones en Red Hat. Fuente: unidad-5/Evidencia U5-Parte A.png.](unidad-5/Evidencia U5-Parte A.png)
 ## Transcripción de la captura
 - Búfer de 1 byte: 2.000.000 de lecturas positivas; 0,5975 s.
 - Búfer de 512 bytes: 3.907 lecturas positivas; 0,0017 s.
@@ -107,6 +120,27 @@ Además, bs=1M y count=100 de dd corresponden a 100 MiB (104.857.600 bytes), aun
 - Interrupciones: 327.624 antes, 327.771 después; diferencia de 147.
 ## Conclusión
 La evidencia muestra que agrupar los bytes reduce fuertemente la cantidad de lecturas y el tiempo observado en esta ejecución. La explicación se relaciona con el costo de las operaciones de entrada/salida y el uso de búferes; la magnitud de la mejora no debe generalizarse a todos los equipos o cargas.
+
+# Unidad 5 | Parte B: drivers y fallos
+## Problema y relación con la unidad
+Un componente interpreta una configuración con veinte campos. Una actualización solicita un campo adicional. El ejercicio analiza qué sucede al acceder a ese campo desde un proceso de usuario y relaciona el resultado con el impacto de un fallo en un componente que se ejecuta dentro del kernel.
+## Caso CrowdStrike
+El 19 de julio de 2024, una actualización de contenido de Falcon para Windows provocó fallos de sistema. El análisis de CrowdStrike explica la discrepancia entre veinte entradas suministradas al intérprete y el acceso a una entrada número veintiuno. La falta de una comprobación de límites permitió una lectura fuera del arreglo. El caso relaciona la validación de datos con la importancia del contexto de ejecución de los controladores. Fuente: CrowdStrike, análisis de causa raíz del Channel File 291 (2024).
+## Implementación de la simulación
+crowdstrike.c consulta el tamaño de página con sysconf, reserva dos páginas con mmap y protege la segunda con mprotect y PROT_NONE. Coloca veinte punteros al final de la primera página. De esta manera, el acceso al puntero veintiuno cae en la página protegida. Esta disposición fuerza un fallo de acceso para la demostración; una lectura fuera de límites en un programa cualquiera no siempre produce una caída inmediata.
+Con el argumento --validar, el programa rechaza una solicitud mayor que veinte antes de recorrer los campos. La simulación se ejecuta en modo usuario y no carga un driver ni modifica el kernel.
+```bash
+cd unidad-5
+bash crowdstrike.sh
+```
+El script compila el programa, consulta los módulos con lsmod y modinfo, ejecuta el caso de veintiún campos, muestra su estado de salida y consulta uptime y dmesg. Luego ejecuta la variante con validación.
+## Comportamiento de los casos
+- ./crowdstrike 20: recorre los veinte campos y termina normalmente.
+- ./crowdstrike 21: intenta leer la página protegida; en el entorno Linux previsto se espera SIGSEGV, representada habitualmente por Bash como estado 139.
+- ./crowdstrike 21 --validar: rechaza la cantidad solicitada y devuelve estado 1 sin realizar el acceso inválido.
+La señal concreta y los registros disponibles dependen del entorno. La consulta de dmesg puede requerir permisos de administración. El código de salida permite distinguir la terminación normal, el rechazo controlado y la terminación por una señal.
+## Conclusión
+En modo usuario, el sistema puede terminar el proceso que realiza el acceso inválido y continuar atendiendo otros procesos. Un fallo dentro del kernel puede comprometer al sistema completo, como ocurrió en el caso analizado. La demostración representa el control de límites y el aislamiento de procesos; no reproduce el componente Falcon ni una caída real del kernel.
 
 # Unidad 6 | Seguridad y exposición de memoria
 ## Problema y objetivo
@@ -132,7 +166,7 @@ La corrección propuesta es comparar con sizeof(datos[0]), que limita el acceso 
 OWASP describe Heartbleed (CVE-2014-0160) como una falta de validación de límites antes de copiar datos, que permitió exponer memoria de OpenSSL. La analogía es devolver más información que la autorizada por confiar en una longitud. Este ejercicio permanece dentro del array de 32 bytes; no reproduce TLS, no lee otros procesos ni accede fuera del objeto completo. Fuente: OWASP, Heartbleed Bug, consultada el 02/11/2026.
 
 # Evidencia de la Unidad 6
-![Figura 4. Rechazo del campo privado, consulta normal y exposición mediante longitud 32. Fuente: unidad-6/Evidencia U6.png.](unidad-6/Evidencia U6.png)
+![Figura 6. Rechazo del campo privado, consulta normal y exposición mediante longitud 32. Fuente: unidad-6/Evidencia U6.png.](unidad-6/Evidencia U6.png)
 ## Lectura de la evidencia
 La imagen original registra la instalación de GCC. El detalle reproducido muestra la compilación manual con gcc unidad-6.c y tres ejecuciones de ./a.out. Primero se rechaza el campo 1. Después se solicita el campo 0 con longitud 8 y se ve usuario. Finalmente, con longitud 32 se observa usuarioclave123; los ceros de relleno no son visibles en la terminal.
 Los tres casos permiten comparar el control sobre el campo solicitado con el control sobre la longitud: el acceso directo se rechaza, pero una consulta al campo autorizado puede abarcar también el dato privado.
@@ -141,9 +175,10 @@ La confidencialidad depende tanto del campo autorizado como de la extensión del
 
 # Conclusiones generales
 Los seis ejercicios relacionan los conceptos de Sistemas Operativos con programas C y herramientas de consola de Red Hat. Las llamadas al sistema permiten solicitar servicios al kernel; la planificación determina cómo se distribuye el tiempo de CPU; y la memoria virtual ofrece a cada proceso un espacio de direcciones sobre el que trabaja la aplicación.
-La administración de almacenamiento conecta dispositivos, particiones, sistemas de archivos y puntos de montaje. En entrada y salida, el tamaño del búfer influye sobre la cantidad de operaciones necesarias para procesar los mismos datos. Finalmente, el ejercicio de seguridad muestra que la protección del sistema operativo debe complementarse con controles adecuados dentro del programa.
+La administración de almacenamiento conecta dispositivos, particiones, sistemas de archivos y puntos de montaje. En entrada y salida, el tamaño del búfer influye sobre la cantidad de operaciones necesarias para procesar los mismos datos. El caso de los controladores permite comparar las consecuencias de un fallo según el modo de ejecución. Finalmente, el ejercicio de seguridad muestra que la protección del sistema operativo debe complementarse con controles adecuados dentro del programa.
 Bash permite organizar estos procedimientos: compilar, ejecutar procesos, esperar su finalización, medir tiempos y consultar el estado del sistema. C permite observar de forma directa operaciones de memoria y entrada/salida. Su uso conjunto vincula la explicación teórica con el funcionamiento de cada ejercicio.
 ## Referencias
 - UADE. Sistemas Operativos: consigna del Trabajo Práctico Obligatorio y material de la asignatura. Segundo cuatrimestre de 2026.
 - Código fuente y capturas de los ejercicios incluidos en este trabajo.
 - OWASP Foundation. Heartbleed Bug. https://community.owasp.org/vulnerabilities/Heartbleed_Bug (consulta: 02/11/2026).
+- CrowdStrike. Executive Summary: Root Cause Analysis - Channel File 291, 6 de agosto de 2024. https://www.crowdstrike.com/wp-content/uploads/2024/08/Executive-Summary_Root-Cause-Analysis_Channel-File-291.pdf (consulta: 02/11/2026).

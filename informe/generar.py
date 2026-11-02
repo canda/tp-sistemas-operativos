@@ -25,7 +25,7 @@ commit=subprocess.check_output(['git','-C',str(repo),'rev-parse',meta['commit']+
 def gitfile(path):
     return subprocess.check_output(['git','-C',str(repo),'show',f'{commit}:{path}'])
 files=subprocess.check_output(['git','-C',str(repo),'ls-tree','-r','--name-only',commit],text=True).splitlines()
-inputs={p:gitfile(p) for p in files if p.endswith(('.c','.sh','.s','.md','.png'))}
+inputs={p:gitfile(p) for p in files if (p.startswith('unidad-') or p == 'consignas-tpo.md') and p.endswith(('.c','.sh','.s','.md','.png','.jpg','.jpeg'))}
 fonts=Path('/System/Library/Fonts/Supplemental')
 for name,filename in [('Body','Arial.ttf'),('Bold','Arial Bold.ttf'),('Mono','Courier New.ttf')]:
     candidate=fonts/filename
@@ -104,8 +104,11 @@ while i<len(lines):
     elif line.startswith('!['):
         match=re.match(r'!\[(.*?)\]\((.*?)\)$',line);caption,path=match.groups()
         data=io.BytesIO(inputs[path]);iw,ih=ImageReader(data).getSize();scale=min(499/iw,275/ih)
-        if path.startswith(('unidad-5/','unidad-6/')):
-            rect=(45,130,1020,670) if path.startswith('unidad-5/') else (45,400,1020,620)
+        if path.startswith(('unidad-2/','unidad-5/','unidad-6/')):
+            if path.startswith('unidad-2/'):
+                rect=(365,230,1080,775) if path.endswith('-1.jpeg') else (370,235,1085,765)
+            else:
+                rect=(45,130,1020,670) if path.startswith('unidad-5/') else (45,400,1020,620)
             visual=ScreenshotDetail(inputs[path],rect)
             caption += ' Detalle de la terminal; se omite el marco de escritorio.'
         else:
