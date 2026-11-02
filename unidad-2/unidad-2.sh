@@ -74,7 +74,7 @@ else
 fi
 
 echo
-echo "=== REPORTE: tiempo total de las 4 tareas ==="
+echo "=== REPORTE: tiempo total de las 10 tareas ==="
 awk -v s="$secuencial" -v p="$pseudoparalela" -v r="$paralela" 'BEGIN {
     printf "%-20s %12s\n", "Modalidad", "Tiempo (s)"
     printf "%-20s %12.3f\n", "Secuencial", s / 1e9

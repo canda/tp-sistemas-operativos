@@ -1,10 +1,10 @@
 # Unidad 2 – Paralelismo y pseudoparalelismo
 
-Una computadora debe realizar cuatro tareas independientes. Cada tarea suma los números de 1 a 1.000.000.000. Se compara el tiempo total para completar las cuatro tareas de tres maneras:
+Una computadora debe realizar diez tareas independientes. Cada tarea suma los números de 1 a 1.000.000.000. Se compara el tiempo total para completar las diez tareas de tres maneras:
 
 - Secuencial: un proceso después del otro, sobre una misma CPU lógica.
-- Pseudoparalela: cuatro procesos concurrentes sobre esa misma CPU lógica. El SO alterna su ejecución.
-- Paralela: cuatro procesos concurrentes con acceso a todas las CPU permitidas. El SO puede ejecutarlos simultáneamente.
+- Pseudoparalela: diez procesos concurrentes sobre esa misma CPU lógica. El SO alterna su ejecución.
+- Paralela: diez procesos concurrentes con acceso a todas las CPU permitidas. El SO puede ejecutarlos simultáneamente.
 
 En la consola del laboratorio Red Hat, desde esta carpeta:
 
