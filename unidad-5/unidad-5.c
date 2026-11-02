@@ -13,6 +13,12 @@ static double ahora(void) {
 }
 
 int main(int argc, char *argv[]) {
+    if (argc < 2) {
+        printf("Uso: %s <archivo> [dispositivos...]\n", argv[0]);
+        printf("Ej:  %s prueba.bin /dev/vda /dev/null /dev/tty /dev/urandom\n", argv[0]);
+        return 1;
+    }
+
     /* Parte 1: tipo de dispositivo y numeros mayor/menor */
     for (int i = 2; i < argc; i++) {
         struct stat st;
@@ -28,6 +34,7 @@ int main(int argc, char *argv[]) {
     for (int t = 0; t < 4; t++) {
         char *buf = malloc(tams[t]);
         int fd = open(argv[1], O_RDONLY);
+        if (fd < 0) { perror(argv[1]); return 1; }
         long llamadas = 0;
         double t0 = ahora();
         while (read(fd, buf, tams[t]) > 0) llamadas++;
@@ -35,5 +42,7 @@ int main(int argc, char *argv[]) {
         close(fd);
         free(buf);
     }
+    return 0;
+}
     return 0;
 }
