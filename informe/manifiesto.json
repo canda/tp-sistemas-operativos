@@ -1,0 +1,32 @@
+{
+  "commit": "8bb8a473336c150d3d983d1a5b1ea103b2607078",
+  "fecha_generacion": "2026-11-02T19:03:55.051266-03:00",
+  "insumos_commit": {
+    "consignas-tpo.md": "eab529f5688950163ee0bd67fda7fa71d6db0398fa49d089b6c307ad07bc1444",
+    "unidad-1/Evidencia U1 - 2.png": "478831b7d1c9861a807bdc3ae03f16182c1ca021fd04800ec898380740be5d8e",
+    "unidad-1/Evidencia U1.png": "f8e8f17b3635fdb2489c62d1dc44b6267fa9c41ede1e0c7c28a259d71ad0f2b0",
+    "unidad-1/compilar.sh": "7b972f9a0a2bf6ad5dcb71d559e442bcc9528f307227bd31f1449b2d0718d1c5",
+    "unidad-1/unidad-1.c": "5b32638a3c44b0e48428a92b40bc6cf2eea5b10ba8867442da7bd3e443192d6a",
+    "unidad-1/unidad-1.md": "4e493f605f90066eb2439eefe05785643037b59e0c095c36229f4a24e5a4e1db",
+    "unidad-1/unidad-1.s": "f13f974bf0e25c0888ddde2af610a5de43e863594366c0892b9bead3fa6569bf",
+    "unidad-2/unidad-2.c": "2988f99bacf47a1ff87c89bd987fa5732bd31ad8714d2b1d241935fb3c99749b",
+    "unidad-2/unidad-2.md": "c77977151fe52ab0750c14db31cbf3523cf6550e73cc1a20101a5a032c69bdfb",
+    "unidad-2/unidad-2.sh": "45a3f81866a6a23b71bef2117ca00df9b975b2923bd3de39af32d14ac6a177dc",
+    "unidad-3/compilar.sh": "11fe6cc9fc26206caca66a61d6ab60d9ac750ae38161a23d626e968c67a9d879",
+    "unidad-3/paginacion.c": "678b3bdcd8fb4a4cb6cfbe264da1175d57431a3621f6897c31dfbdf049d626a6",
+    "unidad-3/unidad-3.md": "d36060324186332a974bda9d9715dcfe9f76a0f354c9d03b9228fe3d830e30ed",
+    "unidad-4/unidad-4.c": "bfa5c19032c4c7ef11556e77c4fa46826c2e7762f977d153b0a8e0e942409a53",
+    "unidad-4/unidad-4.md": "75ca680f4ebbe886514db9aaa481122bc2b3532981ca97f38b34513efeffce3b",
+    "unidad-4/unidad-4.sh": "fc7e032db27efccb66fd2a0ade6b705d7380eead12a595c19ca04e9e8a6fb211",
+    "unidad-5/Evidencia U5.png": "e71d27734018fc53196ef4852a1cdd3ee2a42944144b2ebd3476a0dffbe79417",
+    "unidad-5/ejecutar.sh": "9dc330d72d606bd0e262158b8534d9bfdb6f23ddb5ecc08a2b0fa82fb0dfb92e",
+    "unidad-5/unidad-5.c": "ecde95bc3d18e5767d73de7e2fd1f3ef78916afb6d761761eb0c8d3fa7d1f40f",
+    "unidad-5/unidad-5.md": "a60ad4ac53647ecbc83319a79666289aba72b6de22a40c93eb594038536d5002",
+    "unidad-6/Evidencia U6.png": "e8227500234070cd4c17e50039e845d702514e43b440c00deaf524fcc0d9f805",
+    "unidad-6/unidad-6.c": "bd29c64ab32a9bd22dfd247f8320fc602c75cfbc69d7cd9fb795b3b25feafa21",
+    "unidad-6/unidad-6.md": "03815b393f08b24e9ca113478cdaf89f15519772cfe275399b08e53b13435e1b",
+    "unidad-6/unidad-6.sh": "9f5e3b7946449866854e1323031fdefed630e3f24c68ce255c56e67ff074e16e"
+  },
+  "contenido_sha256": "657b60f20320a456fc0816e82a5e24b2affbad447d04ca841f89ff5648de3dea",
+  "pdf_sha256": "ac65240efdaa9e2a53fb363dc374cfde33fce06ba8150dcb739732bd4072206e"
+}

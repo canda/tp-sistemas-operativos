@@ -1,0 +1,14 @@
+{
+  "fecha": "2 de noviembre de 2026",
+  "docente": "José Santiago Franco",
+  "integrantes": [
+    { "nombre": "Javier Candalaft", "legajo": "1244364" },
+    { "nombre": "Marcos Silva Sapia", "legajo": "1242994" },
+    { "nombre": "Gadiel Aaron Gerez", "legajo": "1239414" },
+    { "nombre": "Gianluca Marcellino", "legajo": "1239133" }
+  ],
+  "commit": "8bb8a473336c150d3d983d1a5b1ea103b2607078",
+  "commit_titulo": "Update Unidad 2 to reflect ten independent tasks and adjust report output accordingly",
+  "commit_fecha": "02/11/2026 18:16:23 -03:00",
+  "rama": "main"
+}
