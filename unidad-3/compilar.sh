@@ -1,27 +1,45 @@
 #!/bin/bash
 
-# Insalar GCC si no está instalado.
+# Verificar GCC
 if ! command -v gcc &> /dev/null; then
-
     echo "GCC no está instalado. Instalando..."
-
     sudo dnf install -y gcc
 fi
 
-# Dar permiso de ejecución al script
-chmod +x "$0"
-
-# Compilar el programa en C
+# Compilar
 gcc -Wall -Wextra -O0 paginacion.c -o paginacion
-
-# Si la compilación falla, no continuar
 if [ $? -ne 0 ]; then
     echo "Error: no se pudo compilar paginacion.c"
     exit 1
 fi
-
-# Dar permiso de ejecución al binario generado
 chmod +x paginacion
 
-# Ejecutar el programa
-./paginacion
+# --- INICIO DEL EJERCICIO PRÁCTICO ---
+echo "======================================================"
+echo "Escenario: Simulando un pico de consumo de memoria"
+echo "de un servicio backend para observar la paginación."
+echo "======================================================"
+
+echo -e "\n[Sistema] Memoria antes de la ejecución (free -h):"
+free -h
+
+# Ejecutar el programa en C en segundo plano
+./paginacion &
+C_PID=$!
+
+# Esperar a que el programa en C asigne la memoria (basado en sus sleeps)
+sleep 5
+
+echo -e "\n[Sistema] Monitoreando el proceso con PID $C_PID (ps):"
+# Mostrar usuario, PID, % de memoria, Tamaño Virtual (VSZ) y Memoria Residente (RSS)
+ps -o user,pid,%mem,vsz,rss,comm -p $C_PID
+
+echo -e "\n[Sistema] Estadísticas de memoria virtual (vmstat):"
+vmstat 1 3
+
+# Esperar a que el programa en C termine naturalmente
+wait $C_PID
+
+echo -e "\n[Sistema] Memoria después de la liberación (free -h):"
+free -h
+echo "======================================================"
