@@ -55,25 +55,29 @@ Los tiempos secuencial y pseudoparalelo son similares, mientras que el acceso co
 
 # Unidad 3 | Compilación, carga y memoria
 ## Problema y objetivo
-Se plantea el escenario hipotético de un servicio backend que sufre un pico repentino de consumo de memoria. La aplicación necesita reservar 100 MiB y acceder de manera espaciada a esa región. Se estudia cómo se construye el ejecutable, cómo se monitorea su ejecución en segundo plano y cómo se evidencian sus accesos físicos a la memoria virtual utilizando herramientas nativas del sistema operativo.
+Se plantea el escenario hipotético de un servicio backend que sufre un pico repentino de consumo de memoria. La aplicación necesita reservar 100 MiB y acceder de manera espaciada a esa región. Se estudia cómo se construye el ejecutable, cómo se monitorea su ejecución en segundo plano y cómo se observa su consumo de memoria virtual y residente utilizando herramientas nativas del sistema operativo.
 ## Fundamento teórico
-La construcción comprende preprocesamiento, compilación, ensamblado y enlace. Al ejecutar el programa, el sistema crea su espacio de direcciones y prepara la imagen del proceso. Las direcciones virtuales utilizadas por el código se traducen mediante las estructuras de memoria y la MMU. La reserva lógica de memoria (demand paging) y la disponibilidad de páginas físicas no son necesariamente el mismo evento.
+La construcción comprende preprocesamiento, compilación, ensamblado y enlace. Al ejecutar el programa, el sistema crea su espacio de direcciones y prepara la imagen del proceso. Las direcciones virtuales utilizadas por el código se traducen mediante las estructuras de memoria y la MMU. La reserva de un rango de direcciones virtuales y la asignación de páginas físicas no son necesariamente el mismo evento. En la paginación por demanda, el sistema resuelve los accesos a páginas que todavía no están presentes cuando el proceso las necesita.
 ## Implementación
-compilar.sh verifica GCC, compila paginacion.c con -Wall -Wextra -O0 y presenta el contexto de la simulación. Para permitir el monitoreo, el script ejecuta el binario en segundo plano (`&`) y captura su PID. El programa solicita 104.857.600 bytes con malloc e introduce pausas estratégicas (usando `sleep`). Luego escribe un byte cada 4096 posiciones, produciendo 25.600 escrituras separadas. 
+compilar.sh verifica GCC, compila paginacion.c con -Wall -Wextra -O0 y presenta el contexto de la simulación. Para permitir el monitoreo, el script ejecuta el binario en segundo plano (`&`) y captura su PID. El programa solicita 104.857.600 bytes con malloc tras una pausa inicial de tres segundos. Luego escribe un byte cada 4096 posiciones, produciendo 25.600 escrituras separadas, y mantiene la reserva durante diez segundos para permitir su observación. 
 Mientras el programa retiene la memoria, el script utiliza comandos de la consola de Red Hat (`free`, `ps`, `vmstat`) para auditar el proceso.
 ```bash
 cd unidad-3
 bash compilar.sh
 ```
 ## Relación con la memoria virtual
-Con páginas de 4096 bytes, el recorrido relaciona cada salto del programa con la granularidad de la paginación. Las escrituras fuerzan fallos de página (page faults), obligando al sistema a asignar marcos físicos para el bloque reservado. 
-Las herramientas de monitoreo evidencian este proceso: `ps` permite contrastar la memoria virtual total solicitada por el proceso (VSZ) con la memoria física residente que realmente ocupó en la RAM (RSS). Por su parte, `vmstat 1 3` y `free -h` reflejan la caída temporal de la memoria disponible a nivel global y su posterior recuperación al finalizar el programa.
+Con páginas de 4096 bytes, el recorrido relaciona cada salto del programa con la granularidad de la paginación. Al escribir en páginas todavía no respaldadas por memoria física, el acceso provoca fallos de página que el sistema atiende asignando los recursos correspondientes. La cantidad de fallos depende de la administración de memoria del entorno y no se cuenta en este programa. 
+La consulta `ps` distingue el tamaño del espacio virtual del proceso (VSZ) de su memoria residente (RSS). Ambos incluyen más componentes que el bloque reservado, como código, bibliotecas y pila. `vmstat 1 3` y `free -h` aportan estadísticas globales; su lectura debe considerar la actividad de otros procesos y el redondeo de las unidades.
 La compilación sin -static utiliza el enlace habitual del entorno, normalmente dinámico en Red Hat. Así, el ejercicio conecta la generación del ejecutable con su carga y el acceso a direcciones virtuales durante la ejecución.
 ## Conclusión
-La reserva con malloc, el recorrido del bloque y su liberación permiten seguir el uso de memoria desde el programa. El sistema operativo administra el espacio de direcciones y su respaldo físico, mientras que las herramientas de consola demuestran cómo la aplicación trabaja con direcciones virtuales que se traducen en consumo real de RAM, el cual es recuperado instantáneamente por el sistema al liberar la memoria.
+La reserva con malloc, el recorrido del bloque y su liberación permiten seguir el uso de memoria desde el programa. El sistema operativo administra el espacio de direcciones y su respaldo físico, mientras que las herramientas de consola permiten observar la memoria residente del proceso durante la reserva. Al terminar el proceso, el sistema libera los recursos que le pertenecían.
 
 # Evidencia de la Unidad 3
-![Figura X. Monitoreo de memoria en Red Hat: ejecución en segundo plano, contraste de memoria VSZ/RSS y estadísticas en tiempo real. Fuente: unidad-3/Captura de pantalla.png.](unidad-3/Captura de pantalla.png)
+![Figura 5. Monitoreo de memoria en Red Hat: ejecución en segundo plano, contraste de memoria VSZ/RSS y estadísticas en tiempo real. Fuente: unidad-3/Evidencia U3.png.](unidad-3/Evidencia U3.png)
+
+## Resultados observados
+La captura muestra el proceso paginacion con PID 3331, VSZ de 105.036 KiB y RSS de 103.348 KiB, aproximadamente 100,9 MiB de memoria residente. Este último valor es coherente con el bloque de 100 MiB utilizado por el programa y el resto de su memoria.
+El entorno informa 0 B de swap y las columnas si/so de vmstat permanecen en cero. En esta ejecución no se observa actividad de intercambio con disco. Los valores redondeados de free -h antes y después coinciden; la evidencia directa del consumo durante la reserva es la consulta de RSS realizada con ps.
 
 # Unidad 4 | Almacenamiento y sistema de archivos
 ## Problema y objetivo
@@ -92,9 +96,15 @@ fdisk define la partición que se utilizará para almacenar los datos. mkfs.xfs 
 La entrada de /etc/fstab usa UUID para identificar el sistema de archivos y /mnt/datos como destino. De esta forma, la configuración de montaje no depende exclusivamente de que el dispositivo mantenga el nombre /dev/vdb1.
 ## Comprobación del montaje
 lsblk permite consultar los dispositivos y particiones; blkid muestra el UUID; findmnt /mnt/datos y df -h permiten comprobar el montaje. Estas consultas verifican el estado del sistema independientemente de los mensajes que imprima el script.
-El archivo C del anexo es un lanzador mediante system y utiliza el nombre configurar_disco.sh. El procedimiento de este ejercicio invoca directamente unidad-4.sh con Bash, como se indica arriba.
+El archivo C del anexo es un lanzador que invoca ./unidad-4.sh mediante system. El procedimiento indicado arriba permite ejecutar el mismo script directamente con Bash y permisos de administración.
 ## Conclusión
 El ejercicio integra particionado, formato y montaje persistente. El uso de UUID vincula la configuración con el sistema de archivos, mientras que las herramientas de consola permiten consultar cada etapa de la administración del almacenamiento.
+
+# Evidencia de la Unidad 4
+![Figura 6. Creación de la partición, formateo XFS y montaje de /dev/vdb1 en /mnt/datos. Fuente: unidad-4/unidad-4.png.](unidad-4/unidad-4.png)
+## Resultados observados
+La sesión de consola muestra la creación de una partición de 5 GiB, el formateo con XFS y la consulta de espacio del volumen montado. La línea final de df identifica /dev/vdb1 en /mnt/datos, con 5,0 G de capacidad, 68 M utilizados y 4,9 G disponibles.
+La configuración de /etc/fstab expresa el montaje para futuros arranques. La captura permite observar el montaje durante esta sesión; la persistencia después de reiniciar se comprueba por separado.
 
 # Unidad 5 | Entrada y salida: parte A
 ## Problema y objetivo
@@ -115,7 +125,7 @@ La caché de páginas y el orden fijo de las pruebas influyen en los tiempos: no
 Además, bs=1M y count=100 de dd corresponden a 100 MiB (104.857.600 bytes), aunque el mensaje del script diga 100 MB. El archivo de lectura sí contiene 2 MB decimales.
 
 # Evidencia de la Unidad 5 | Parte A
-![Figura 5. Dispositivos, lecturas con distintos búferes e interrupciones en Red Hat. Fuente: unidad-5/Evidencia U5-Parte A.png.](unidad-5/Evidencia U5-Parte A.png)
+![Figura 7. Dispositivos, lecturas con distintos búferes e interrupciones en Red Hat. Fuente: unidad-5/Evidencia U5-Parte A.png.](unidad-5/Evidencia U5-Parte A.png)
 ## Transcripción de la captura
 - Búfer de 1 byte: 2.000.000 de lecturas positivas; 0,5975 s.
 - Búfer de 512 bytes: 3.907 lecturas positivas; 0,0017 s.
@@ -146,6 +156,12 @@ La señal concreta y los registros disponibles dependen del entorno. La consulta
 ## Conclusión
 En modo usuario, el sistema puede terminar el proceso que realiza el acceso inválido y continuar atendiendo otros procesos. Un fallo dentro del kernel puede comprometer al sistema completo, como ocurrió en el caso analizado. La demostración representa el control de límites y el aislamiento de procesos; no reproduce el componente Falcon ni una caída real del kernel.
 
+# Evidencia de la Unidad 5 | Parte B
+![Figura 8. Ejecución de la simulación CrowdStrike en Red Hat y comparación con la validación de campos. Fuente: unidad-5/Evidencia U5-Parte B.png.](unidad-5/Evidencia U5-Parte B.png)
+## Resultados observados
+La sesión informa 111 módulos cargados y muestra información de virtio_blk. Durante la simulación, los veinte primeros campos se leen normalmente. El acceso al campo veintiuno provoca Segmentation fault y el script informa el código de salida 139.
+Después del fallo, uptime muestra que el sistema sigue activo y dmesg registra el acceso inválido del proceso crowdstrike. La ejecución con --validar rechaza la solicitud de veintiún campos e imprime que el sistema sigue funcionando. La comparación muestra el aislamiento del proceso y el efecto de controlar la cantidad de campos antes de leerlos.
+
 # Unidad 6 | Seguridad y exposición de memoria
 ## Problema y objetivo
 Una aplicación permite consultar el nombre de usuario y prohíbe consultar una contraseña ficticia. El solicitante elige el campo y la longitud. Se demuestra que bloquear el acceso directo al campo privado no alcanza cuando una longitud excesiva permite incluir sus bytes en otra respuesta.
@@ -170,7 +186,7 @@ La corrección propuesta es comparar con sizeof(datos[0]), que limita el acceso 
 OWASP describe Heartbleed (CVE-2014-0160) como una falta de validación de límites antes de copiar datos, que permitió exponer memoria de OpenSSL. La analogía es devolver más información que la autorizada por confiar en una longitud. Este ejercicio permanece dentro del array de 32 bytes; no reproduce TLS, no lee otros procesos ni accede fuera del objeto completo. Fuente: OWASP, Heartbleed Bug, consultada el 02/11/2026.
 
 # Evidencia de la Unidad 6
-![Figura 6. Rechazo del campo privado, consulta normal y exposición mediante longitud 32. Fuente: unidad-6/Evidencia U6.png.](unidad-6/Evidencia U6.png)
+![Figura 9. Rechazo del campo privado, consulta normal y exposición mediante longitud 32. Fuente: unidad-6/Evidencia U6.png.](unidad-6/Evidencia U6.png)
 ## Lectura de la evidencia
 La imagen original registra la instalación de GCC. El detalle reproducido muestra la compilación manual con gcc unidad-6.c y tres ejecuciones de ./a.out. Primero se rechaza el campo 1. Después se solicita el campo 0 con longitud 8 y se ve usuario. Finalmente, con longitud 32 se observa usuarioclave123; los ceros de relleno no son visibles en la terminal.
 Los tres casos permiten comparar el control sobre el campo solicitado con el control sobre la longitud: el acceso directo se rechaza, pero una consulta al campo autorizado puede abarcar también el dato privado.

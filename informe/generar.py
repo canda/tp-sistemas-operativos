@@ -44,7 +44,10 @@ styles.add(ParagraphStyle(name='CodeCustom',fontName='Mono',fontSize=8.2,leading
 styles.add(ParagraphStyle(name='SmallCustom',fontName='Body',fontSize=8,leading=11,textColor=gray,spaceAfter=6))
 W,H=595.276,841.89
 story=[]
-def p(t,sty='TextCustom'):return Paragraph(html.escape(t),styles[sty])
+def p(t,sty='TextCustom'):
+    escaped=html.escape(t)
+    escaped=re.sub(r'`([^`]+)`', r'<font name="Mono">\1</font>', escaped)
+    return Paragraph(escaped,styles[sty])
 class NumberedCanvas(canvas.Canvas):
     def __init__(self,*a,**kw):super().__init__(*a,**kw);self.states=[]
     def showPage(self):self.states.append(dict(self.__dict__));self._startPage()
@@ -104,12 +107,17 @@ while i<len(lines):
     elif line.startswith('!['):
         match=re.match(r'!\[(.*?)\]\((.*?)\)$',line);caption,path=match.groups()
         data=io.BytesIO(inputs[path]);iw,ih=ImageReader(data).getSize();scale=min(499/iw,275/ih)
-        if path.startswith(('unidad-2/','unidad-5/','unidad-6/')):
-            if path.startswith('unidad-2/'):
-                rect=(365,230,1080,775) if path.endswith('-1.jpeg') else (370,235,1085,765)
-            else:
-                rect=(45,130,1020,670) if path.startswith('unidad-5/') else (45,400,1020,620)
-            visual=ScreenshotDetail(inputs[path],rect)
+        crops={
+            'unidad-2/unidad-2-evidencia-1.jpeg':(365,230,1080,775),
+            'unidad-2/unidad-2-evidencia-2.jpeg':(370,235,1085,765),
+            'unidad-3/Evidencia U3.png':(90,180,935,760),
+            'unidad-4/unidad-4.png':(418,170,1530,855),
+            'unidad-5/Evidencia U5-Parte A.png':(45,130,1020,670),
+            'unidad-5/Evidencia U5-Parte B.png':(350,175,1180,700),
+            'unidad-6/Evidencia U6.png':(45,400,1020,620)
+        }
+        if path in crops:
+            visual=ScreenshotDetail(inputs[path],crops[path])
             caption += ' Detalle de la terminal; se omite el marco de escritorio.'
         else:
             visual=Image(data,width=iw*scale,height=ih*scale)

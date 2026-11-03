@@ -1,6 +1,6 @@
 {
-  "commit": "5f6cf47923a476f44c6db0672c831cd736a80847",
-  "fecha_generacion": "2026-11-02T19:20:27.000974-03:00",
+  "commit": "5936daac62e70f03619d077531353763733f7bfa",
+  "fecha_generacion": "2026-11-02T23:41:44.436569-03:00",
   "insumos_commit": {
     "consignas-tpo.md": "eab529f5688950163ee0bd67fda7fa71d6db0398fa49d089b6c307ad07bc1444",
     "unidad-1/Evidencia U1 - 2.png": "478831b7d1c9861a807bdc3ae03f16182c1ca021fd04800ec898380740be5d8e",
@@ -14,23 +14,26 @@
     "unidad-2/unidad-2.c": "2988f99bacf47a1ff87c89bd987fa5732bd31ad8714d2b1d241935fb3c99749b",
     "unidad-2/unidad-2.md": "c77977151fe52ab0750c14db31cbf3523cf6550e73cc1a20101a5a032c69bdfb",
     "unidad-2/unidad-2.sh": "45a3f81866a6a23b71bef2117ca00df9b975b2923bd3de39af32d14ac6a177dc",
-    "unidad-3/compilar.sh": "11fe6cc9fc26206caca66a61d6ab60d9ac750ae38161a23d626e968c67a9d879",
-    "unidad-3/paginacion.c": "678b3bdcd8fb4a4cb6cfbe264da1175d57431a3621f6897c31dfbdf049d626a6",
+    "unidad-3/Evidencia U3.png": "cac32bd074b02b9599beea7e47b75e86591a543c5cf4baa164b0182ec0ca157a",
+    "unidad-3/compilar.sh": "91227133d84cfac00216c29202bcc0077c157b14cb5ced93d7a93e6881166568",
+    "unidad-3/paginacion.c": "d6515a85ccdbcbe80c9dcbbe050b04e0a3d274d31158653e8bf8dfe9c4348553",
     "unidad-3/unidad-3.md": "d36060324186332a974bda9d9715dcfe9f76a0f354c9d03b9228fe3d830e30ed",
-    "unidad-4/unidad-4.c": "bfa5c19032c4c7ef11556e77c4fa46826c2e7762f977d153b0a8e0e942409a53",
+    "unidad-4/unidad-4.c": "0f5a50e43f1c855a2c8b9dfd2ec9f4483d226184b44553a52b38bc0b952df521",
     "unidad-4/unidad-4.md": "75ca680f4ebbe886514db9aaa481122bc2b3532981ca97f38b34513efeffce3b",
+    "unidad-4/unidad-4.png": "9697cd14c57f56264cceed7a887da770af273e489ab57878878d6d1c33aaa150",
     "unidad-4/unidad-4.sh": "fc7e032db27efccb66fd2a0ade6b705d7380eead12a595c19ca04e9e8a6fb211",
     "unidad-5/Evidencia U5-Parte A.png": "e71d27734018fc53196ef4852a1cdd3ee2a42944144b2ebd3476a0dffbe79417",
+    "unidad-5/Evidencia U5-Parte B.png": "b4943e7f4938f2e2af68a6c902ebeba2896e5608d000819b9efefdc3b16e8ba7",
     "unidad-5/crowdstrike.c": "dde98f534036451591a7190f5aa87719c1adc12361132bc02a8e1f81a5db8e6e",
     "unidad-5/crowdstrike.sh": "840e9b45067f15010a5cd32683237d568cec4c29af5f79184512a1878d1b7b42",
     "unidad-5/ejecutar.sh": "9dc330d72d606bd0e262158b8534d9bfdb6f23ddb5ecc08a2b0fa82fb0dfb92e",
-    "unidad-5/unidad-5.c": "a2f551cdd933ed050d38b7db3fea9ae63e078598d11d09c16a44a8cf367a8a37",
+    "unidad-5/unidad-5.c": "06b7759e0e603c058b840400de7f2a29dd108fa01ea0cd2820ab688dbab3a473",
     "unidad-5/unidad-5.md": "e088b5b8cb7afe7d456a965af738701fb51cceda5cbdb5e2616df4c4ee3f9c98",
     "unidad-6/Evidencia U6.png": "e8227500234070cd4c17e50039e845d702514e43b440c00deaf524fcc0d9f805",
     "unidad-6/unidad-6.c": "bd29c64ab32a9bd22dfd247f8320fc602c75cfbc69d7cd9fb795b3b25feafa21",
     "unidad-6/unidad-6.md": "03815b393f08b24e9ca113478cdaf89f15519772cfe275399b08e53b13435e1b",
     "unidad-6/unidad-6.sh": "9f5e3b7946449866854e1323031fdefed630e3f24c68ce255c56e67ff074e16e"
   },
-  "contenido_sha256": "619cc30d3e2ad921f69d502dbe8c71bf51311fae8163dba8a83687289aaf6df1",
-  "pdf_sha256": "b0fd17b8896e243dcfd061e64beb34e819cc202ff7a19a5606058eeb37ffd4d6"
+  "contenido_sha256": "a6f7280b6fede6a4ab25b276b382e7e8d37917b48b76978b039ec7c615a10f35",
+  "pdf_sha256": "b1bb0a327d09ee25cc7bd6569058c7342c31049820c23114a549a2c1775762bc"
 }
