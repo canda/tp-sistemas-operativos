@@ -55,21 +55,25 @@ Los tiempos secuencial y pseudoparalelo son similares, mientras que el acceso co
 
 # Unidad 3 | Compilación, carga y memoria
 ## Problema y objetivo
-Una aplicación necesita reservar 100 MiB y acceder de manera espaciada a esa región. Se estudia cómo se construye el ejecutable, cómo comienza su ejecución y cómo se relacionan sus accesos con la memoria virtual.
+Se plantea el escenario hipotético de un servicio backend que sufre un pico repentino de consumo de memoria. La aplicación necesita reservar 100 MiB y acceder de manera espaciada a esa región. Se estudia cómo se construye el ejecutable, cómo se monitorea su ejecución en segundo plano y cómo se evidencian sus accesos físicos a la memoria virtual utilizando herramientas nativas del sistema operativo.
 ## Fundamento teórico
-La construcción comprende preprocesamiento, compilación, ensamblado y enlace. Al ejecutar el programa, el sistema crea su espacio de direcciones y prepara la imagen del proceso. Las direcciones virtuales utilizadas por el código se traducen mediante las estructuras de memoria y la MMU. La reserva lógica de memoria y la disponibilidad de páginas físicas no son necesariamente el mismo evento.
+La construcción comprende preprocesamiento, compilación, ensamblado y enlace. Al ejecutar el programa, el sistema crea su espacio de direcciones y prepara la imagen del proceso. Las direcciones virtuales utilizadas por el código se traducen mediante las estructuras de memoria y la MMU. La reserva lógica de memoria (demand paging) y la disponibilidad de páginas físicas no son necesariamente el mismo evento.
 ## Implementación
-compilar.sh verifica GCC, compila paginacion.c con -Wall -Wextra -O0, verifica el resultado de compilación y ejecuta el binario. Debe invocarse desde la carpeta unidad-3 porque usa rutas relativas y no cambia por sí mismo a su directorio.
-El programa solicita 104.857.600 bytes con malloc. Si la reserva falla, informa el error. Luego escribe un byte cada 4096 posiciones, muestra un mensaje y libera la región. Esto produce 25.600 escrituras separadas por 4096 bytes. El tamaño 4096 está fijado en el programa; no se consulta el tamaño de página del sistema.
+compilar.sh verifica GCC, compila paginacion.c con -Wall -Wextra -O0 y presenta el contexto de la simulación. Para permitir el monitoreo, el script ejecuta el binario en segundo plano (`&`) y captura su PID. El programa solicita 104.857.600 bytes con malloc e introduce pausas estratégicas (usando `sleep`). Luego escribe un byte cada 4096 posiciones, produciendo 25.600 escrituras separadas. 
+Mientras el programa retiene la memoria, el script utiliza comandos de la consola de Red Hat (`free`, `ps`, `vmstat`) para auditar el proceso.
 ```bash
 cd unidad-3
 bash compilar.sh
 ```
 ## Relación con la memoria virtual
-Con páginas de 4096 bytes, el recorrido relaciona cada salto del programa con la granularidad de la paginación. Las 25.600 escrituras describen los accesos realizados sobre el bloque reservado; la asignación de páginas físicas depende de la alineación y de la administración de memoria del sistema. El tamaño de página puede consultarse con getconf PAGESIZE.
+Con páginas de 4096 bytes, el recorrido relaciona cada salto del programa con la granularidad de la paginación. Las escrituras fuerzan fallos de página (page faults), obligando al sistema a asignar marcos físicos para el bloque reservado. 
+Las herramientas de monitoreo evidencian este proceso: `ps` permite contrastar la memoria virtual total solicitada por el proceso (VSZ) con la memoria física residente que realmente ocupó en la RAM (RSS). Por su parte, `vmstat 1 3` y `free -h` reflejan la caída temporal de la memoria disponible a nivel global y su posterior recuperación al finalizar el programa.
 La compilación sin -static utiliza el enlace habitual del entorno, normalmente dinámico en Red Hat. Así, el ejercicio conecta la generación del ejecutable con su carga y el acceso a direcciones virtuales durante la ejecución.
 ## Conclusión
-La reserva con malloc, el recorrido del bloque y su liberación permiten seguir el uso de memoria desde el programa. El sistema operativo administra el espacio de direcciones y su respaldo físico, mientras que la aplicación trabaja con direcciones virtuales.
+La reserva con malloc, el recorrido del bloque y su liberación permiten seguir el uso de memoria desde el programa. El sistema operativo administra el espacio de direcciones y su respaldo físico, mientras que las herramientas de consola demuestran cómo la aplicación trabaja con direcciones virtuales que se traducen en consumo real de RAM, el cual es recuperado instantáneamente por el sistema al liberar la memoria.
+
+# Evidencia de la Unidad 3
+![Figura X. Monitoreo de memoria en Red Hat: ejecución en segundo plano, contraste de memoria VSZ/RSS y estadísticas en tiempo real. Fuente: unidad-3/Captura de pantalla.png.](unidad-3/Captura de pantalla.png)
 
 # Unidad 4 | Almacenamiento y sistema de archivos
 ## Problema y objetivo
